@@ -4,7 +4,7 @@ from texlib import wrap
 def add_closing_penalty (L, configs):
     "Add the standard penalty for the end of a paragraph"
     if configs['style'] == 'centered':
-        L.append( wrap.Glue(0, 18, 0) ) 
+        L.append( wrap.Glue(0, configs["glueStrechability"], 0) ) 
     L.append( wrap.Penalty(0, -wrap.INFINITY, 0) )
 
 def show_box_glue_penalty(L, normalForm=False):  
@@ -49,26 +49,32 @@ def assemble_paragraph(text, configs):
         text = ' '.join(text.split())
         L = wrap.ObjectList()
         L.debug=1
-        if configs['identation'] != None or configs['style'] == 'centered':
+        if configs['identation'] != None or configs['style'] == 'centered' or configs['style'] == 'ragged_left':
             if configs['identation']:
                 b = wrap.Box(configs['identation'], ' ')
             else:
-                b = wrap.Glue(0, 18, 0)
+                b = wrap.Glue(0, configs["glueStrechability"], 0)
             L.append( b )
         for ch in text:
             if ch in ' \n': 
                 # Append interword space
                 if configs['style'] == "ragged_right":
-                    L.append( wrap.Glue(0, 18, 0) )
+                    L.append( wrap.Glue(0, configs["glueStrechability"], 0) )
                     L.append( wrap.Penalty(0, 0) ) 
-                    L.append( wrap.Glue(6, -18, 0) )
-                elif configs['style'] == "centered":
-                    L.append( wrap.Glue(0, 18, 0) )
-                    L.append( wrap.Penalty(0, 0) ) 
-                    L.append( wrap.Glue(6, -36, 0) )
+                    L.append( wrap.Glue(configs['glueWidth'], -configs["glueStrechability"], 0) )
+                elif configs['style'] == "ragged_left":
+                    L.append( wrap.Penalty(0, 999) ) 
+                    L.append( wrap.Glue(configs['glueWidth'], -configs["glueStrechability"], glueShrinkability) )
                     L.append( wrap.Box(0, ch) )
                     L.append( wrap.Penalty(0, wrap.INFINITY) ) 
-                    L.append( wrap.Glue(0, 18, 0) )
+                    L.append( wrap.Glue(0, configs["glueStrechability"], 0) )
+                elif configs['style'] == "centered":
+                    L.append( wrap.Glue(0, configs["glueStrechability"], 0) )
+                    L.append( wrap.Penalty(0, 0) ) 
+                    L.append( wrap.Glue(configs['glueWidth'], -2*configs["glueStrechability"], 0) )
+                    L.append( wrap.Box(0, ch) )
+                    L.append( wrap.Penalty(0, wrap.INFINITY) ) 
+                    L.append( wrap.Glue(0, configs["glueStrechability"], 0) )
                 else:
                     L.append( wrap.Glue(configs['glueWidth'],configs['glueStrechability'],configs['glueShrinkability']) )
             elif ch == '@':
@@ -82,9 +88,9 @@ def assemble_paragraph(text, configs):
                 if ch == '-':
                     if configs['style'] == "ragged_right":
                         L.append( wrap.Penalty(0, wrap.INFINITY ) ) 
-                        L.append( wrap.Glue(0, 18, 0) )
-                        L.append( wrap.Penalty(6, 500, 1 ) ) 
-                        L.append( wrap.Glue(0 , -18, 0) )
+                        L.append( wrap.Glue(0, configs["glueStrechability"], 0) )
+                        L.append( wrap.Penalty(configs['glueWidth'], 500, 1 ) ) 
+                        L.append( wrap.Glue(0 , -configs["glueStrechability"], 0) )
                     else:
                         b = wrap.Box(configs["punctuationChar"], ch)
                 elif configs["punctuationChar"] != None and isPunctuation(ch):
@@ -114,7 +120,7 @@ if __name__ == '__main__':
         "glueShrinkability": 3,
         "identation": 10,
         "lineWidth": 95,
-        "style": None #ragged_right, #centered
+        "style": None #ragged_right, #centered, #ragged_left
     }
     L = assemble_paragraph(text, configs)
     show_box_glue_penalty(L, True)
