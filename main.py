@@ -1,10 +1,11 @@
 from texlib import wrap
 
+
 def add_closing_penalty (L):
     "Add the standard penalty for the end of a paragraph"
     L.append( wrap.Penalty(0, -wrap.INFINITY, 1) )
 
-def showBoxGluePenalty(L, normalForm=False):  
+def show_box_glue_penalty(L, normalForm=False):  
     i = 0 
     while i < len(L):
         obj = L[i]
@@ -90,7 +91,9 @@ if __name__ == '__main__':
         "lineWidth": 95,
     }
     L = assemble_paragraph(text, configs)
-    showBoxGluePenalty(L)
+    show_box_glue_penalty(L)
     line_lengths = [configs['lineWidth']]
     breaks = L.compute_breakpoints(line_lengths)
-    print "Feasible breakpoints:", breaks
+    feasible_breaks = L.get_feasible_breakpoints()
+    print "Optimal breakpoints:", breaks
+    print "Feasible breakpoints:", feasible_breaks

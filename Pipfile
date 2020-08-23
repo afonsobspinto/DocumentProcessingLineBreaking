@@ -3,11 +3,12 @@ url = "https://pypi.python.org/simple"
 verify_ssl = true
 name = "pypi"
 
-[packages]
-texlib = "*"
-
 [dev-packages]
-pylint = "<2.0.0"
 
 [requires]
 python_version = "2.7"
+
+[packages.texlib]
+git = "https://github.com/afonsobspinto/texlib.git"
+editable = true
+ref = "feature/feasible"

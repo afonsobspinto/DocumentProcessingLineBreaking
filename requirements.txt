@@ -1,0 +1,1 @@
+-e git+https://github.com/afonsobspinto/texlib.git@feature/feasible#egg=texlib
