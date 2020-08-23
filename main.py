@@ -4,25 +4,29 @@ def add_closing_penalty (L):
     "Add the standard penalty for the end of a paragraph"
     L.append( wrap.Penalty(0, -wrap.INFINITY, 1) )
 
-def showBoxGluePenalty(objs):  
+def showBoxGluePenalty(L, normalForm=False):  
     i = 0 
-    while i < len(objs):
-        obj = objs[i]
+    while i < len(L):
+        obj = L[i]
         if obj.is_box():
-            i = _addUpNearBoxes(i, objs, obj.width) 
+            if normalForm:
+                i = _addUpNearBoxes(i, L, obj.width)
+            else:
+                print i, ".", "B(", obj.width, ")" 
+                i+=1
         elif obj.is_glue():
-            print "G(", obj.width, ",", obj.stretch, ",", obj.shrink, ")"
+            print i, ".", "G(", obj.width, ",", obj.stretch, ",", obj.shrink, ")"
             i+=1
         elif obj.is_penalty():
-            print "P(", obj.width, ",", obj.penalty, ",", obj.flagged, ")" 
+            print i, ".", "P(", obj.width, ",", obj.penalty, ",", obj.flagged, ")" 
             i+=1
 
-def _addUpNearBoxes(i, objs, acc):
-    while i < len(objs):
+def _addUpNearBoxes(i, L, acc):
+    while i < len(L):
         i += 1
-        obj = objs[i]
+        obj = L[i]
         if obj.is_box():
-            return _addUpNearBoxes(i, objs, acc+obj.width)
+            return _addUpNearBoxes(i, L, acc+obj.width)
         else:
             print "B(", acc, ")" 
             return i
@@ -41,6 +45,7 @@ def assemble_paragraph(text, configs):
         # Normalize the text
         text = ' '.join(text.split())
         L = wrap.ObjectList()
+        L.debug=1
         if configs['identation'] != None:
                 b = wrap.Box(configs['identation'], ' ')
                 L.append( b )
@@ -86,3 +91,6 @@ if __name__ == '__main__':
     }
     L = assemble_paragraph(text, configs)
     showBoxGluePenalty(L)
+    line_lengths = [configs['lineWidth']]
+    breaks = L.compute_breakpoints(line_lengths)
+    print "Feasible breakpoints:", breaks
