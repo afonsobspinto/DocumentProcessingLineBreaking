@@ -15,13 +15,13 @@ def show_box_glue_penalty(L, normalForm=False):
             if normalForm:
                 i = _addUpNearBoxes(i, L, obj.width)
             else:
-                print i, ".", "B(", obj.width, ")" 
+                print i, ". B(", obj.width, ")" 
                 i+=1
         elif obj.is_glue():
-            print i, ".", "G(", obj.width, ",", obj.stretch, ",", obj.shrink, ")"
+            print i, ". G(", obj.width, ",", obj.stretch, ",", obj.shrink, ")"
             i+=1
         elif obj.is_penalty():
-            print i, ".", "P(", obj.width, ",", obj.penalty, ",", obj.flagged, ")" 
+            print i, ". P(", obj.width, ",", obj.penalty, ",", obj.flagged, ")" 
             i+=1
 
 def _addUpNearBoxes(i, L, acc):
@@ -31,7 +31,7 @@ def _addUpNearBoxes(i, L, acc):
         if obj.is_box():
             return _addUpNearBoxes(i, L, acc+obj.width)
         else:
-            print "B(", acc, ")" 
+            print i-1, ". B(", acc, ")" 
             return i
 
 
@@ -117,8 +117,8 @@ if __name__ == '__main__':
         "style": None #ragged_right, #centered
     }
     L = assemble_paragraph(text, configs)
-    show_box_glue_penalty(L)
-    line_lengths = [configs['lineWidth']]
+    show_box_glue_penalty(L, True)
+    line_lengths = [configs['lineWidth']]   
     breaks = L.compute_breakpoints(line_lengths)
     feasible_breaks = L.get_feasible_breakpoints()
     print "Optimal breakpoints:", breaks
